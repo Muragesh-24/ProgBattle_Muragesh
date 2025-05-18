@@ -32,7 +32,13 @@ const __dirname = path.dirname(__filename);
 app.use(cookieParser());
 app.use(cors({
   origin: ['http://localhost:5173', 'https://prog-battale-frontend.vercel.app'],
-  credentials: true
+  credentials: true,
+}));
+
+
+app.options('*', cors({
+  origin: ['http://localhost:5173', 'https://prog-battale-frontend.vercel.app'],
+  credentials: true,
 }));
 
 
