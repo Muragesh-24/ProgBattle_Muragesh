@@ -43,7 +43,11 @@ app.use(
     secret: process.env.ADMIN_PASSWORD_HASH,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, 
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000, 
+    },
   })
 );
 
