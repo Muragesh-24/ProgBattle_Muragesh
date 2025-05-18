@@ -48,6 +48,13 @@ router.get('/alllteams', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
+router.get("/protected-data", (req, res) => {
+ console.log(req.session.authenticated)
+  if (req.session.authenticated) {
+    res.status(200).json({ message: "You are authorized." });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
 
 export default router; 

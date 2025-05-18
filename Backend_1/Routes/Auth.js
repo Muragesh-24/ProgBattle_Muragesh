@@ -11,8 +11,8 @@ const JWT_SECRET = 'murageshismuragesh';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'engigrow@gmail.com',
-    pass: 'xnvpunbwytfebolo'
+    user: 'engigrow@gmail.com', ///fake account 
+    pass: 'xnvpunbwytfebolo'   ///so add ur gmail here 
   }
 });
 
@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (email, token) => {
     
 console.log(token)
-  const url = `http://localhost:5000/api/verify-email?token=${token}`; // Adjust this to your frontend domain
+  const url = `https://progbattle-muragesh.onrender.com/api/verify-email?token=${token}`; // Adjust this to your frontend domain
   const options = {
     from: 'engigrow@gmail.com',
     to: email,

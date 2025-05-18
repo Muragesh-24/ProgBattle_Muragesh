@@ -89,13 +89,7 @@ app.post('/Adminlogin', async (req, res) => {
   }
 });
 ////////////route2/////////////////////////////////////////////////////////////////////////
-app.get("/api/protected-data", (req, res) => {
-  if (req.session.authenticated) {
-    res.status(200).json({ message: "You are authorized." });
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
-});
+
 ////////////route 3/////////////////////////////////////////////////////////////////////////
 app.use('/api', Auth);
 app.use('/api',Verify)
