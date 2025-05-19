@@ -45,7 +45,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.ADMIN_PASSWORD_HASH,
+    secret: "helloworld",
     resave: false,
     saveUninitialized: false,
     cookie: {
