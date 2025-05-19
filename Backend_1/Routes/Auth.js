@@ -44,11 +44,13 @@ router.post('/pre-register', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '15m' } 
     );
-     res.cookie('token', token, {
-      httpOnly: true,
-      secure: false, 
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+   res.cookie('token', token, {
+  httpOnly: true,
+  secure: true, // MUST be true when using sameSite: 'None'
+  sameSite: 'None', // Needed for cross-origin cookie sharing
+  maxAge: 24 * 60 * 60 * 1000,
+});
+
     await sendVerificationEmail(email, token);
 
     res.status(200).json({ message: 'Verification email sent. Please check your inbox.' });
