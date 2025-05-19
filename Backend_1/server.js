@@ -31,7 +31,7 @@ const __dirname = path.dirname(__filename);
 
 app.use(cookieParser());
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://prog-battale-frontend-git-main-murageshs-projects.vercel.app/'],
+  origin: ['http://localhost:5173', 'https://prog-battale-frontend-git-main-murageshs-projects.vercel.app/','https://prog-battale-frontend.vercel.app/'],
   credentials: true,
 }));
 
