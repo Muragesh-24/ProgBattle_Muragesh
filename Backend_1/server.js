@@ -174,7 +174,7 @@ app.post('/teams/create', async (req, res) => {
    const team = new Team({
       name,
       leader: leader._id,
-      members: members.map(m => m._id),
+      members: [leader._id, ...members.map(m => m._id)],
       points: 0,
       submissions: []
     });
