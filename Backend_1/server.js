@@ -35,10 +35,10 @@ app.use(cors({
   credentials: true,
 }));
 
-app.options('*', cors({
-  origin: ['http://localhost:5173', 'https://prog-battale-frontend-git-main-murageshs-projects.vercel.app'],
-  credentials: true,
-}));
+// app.options('*', cors({
+//   origin: ['http://localhost:5173', 'https://prog-battale-frontend-git-main-murageshs-projects.vercel.app'],
+//   credentials: true,
+// }));
 
 
 app.use(express.json());
