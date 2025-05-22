@@ -308,7 +308,44 @@ app.post('/evaluate-all', async (req, res) => {
             await team.save().catch(e => console.error('Error updating status:', e.message));
             return resolve();
           }
+///////////////////////////////////////////////////////////////////////////
 
+
+const gameData = [];
+
+fs.createReadStream("game_log.csv") 
+  .pipe(csv())
+  .on("data", (row) => {
+    gameData.push({
+      step: Number(row.step),
+      ball_x: Number(row.ball_x),
+      ball_y: Number(row.ball_y),
+      paddle1_x: Number(row.paddle1_x),
+      paddle2_x: Number(row.paddle2_x),
+      bot1_action: row.bot1_action,
+      bot2_action: row.bot2_action,
+      score_bot1: Number(row.score_bot1),
+      score_bot2: Number(row.score_bot2),
+    });
+  })
+  .on("end", async () => {
+    console.log("CSV file successfully processed");
+
+    try {
+      team.game_log = gameData;
+      await team.save();
+      console.log("Game log saved to MongoDB.");
+    } catch (err) {
+      console.error("Error saving team:", err);
+    }
+  });
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
           console.log(`Output for team ${teamId}:`, stdout);
 
           const scoreMatch = stdout.match(/Final Score: ({.*})/);
