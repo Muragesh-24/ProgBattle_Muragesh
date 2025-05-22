@@ -328,21 +328,22 @@ fs.createReadStream("game_log.csv")
       score_bot2: Number(row.score_bot2),
     });
   })
-  .on("end", async () => {
-    console.log("CSV file successfully processed");
+ .on("end", async () => {
+  console.log("CSV file successfully processed");
+  console.log("Parsed game data:", gameData);
 
-
-    const gameDataa = await parseCSV("game_log.csv");
-
-    
+  if (Array.isArray(gameData) && gameData.length > 0) {
     try {
-        team.game_log = gameDataa;
+      team.game_log = gameData;
       await team.save();
       console.log("Game log saved to MongoDB.");
     } catch (err) {
-      console.error("Error saving team:", err);
+      console.error("Error saving team:", err.message, err);
     }
-  });
+  } else {
+    console.warn("No game data parsed from CSV for team", team._id);
+  }
+});
 
 
  //////////////////////////////////////////////////////////////////////////
