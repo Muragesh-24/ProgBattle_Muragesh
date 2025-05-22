@@ -331,8 +331,12 @@ fs.createReadStream("game_log.csv")
   .on("end", async () => {
     console.log("CSV file successfully processed");
 
+
+    const gameDataa = await parseCSV("game_log.csv");
+
+    
     try {
-      team.game_log = gameData;
+        team.game_log = gameDataa;
       await team.save();
       console.log("Game log saved to MongoDB.");
     } catch (err) {
@@ -341,11 +345,7 @@ fs.createReadStream("game_log.csv")
   });
 
 
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////////////////////
           console.log(`Output for team ${teamId}:`, stdout);
 
           const scoreMatch = stdout.match(/Final Score: ({.*})/);
