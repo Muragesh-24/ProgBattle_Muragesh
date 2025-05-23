@@ -278,134 +278,91 @@ app.post('/save-python', async (req, res) => {
 app.post('/evaluate-all', async (req, res) => {
   try {
     const pendingTeams = await Team.find({ 'submissions.checkStatus': 'pending' });
-    const allteams = await Team.find();
 
     for (const team of pendingTeams) {
       const code = team.submissions.code;
       const teamId = team._id.toString();
       const tempDir = path.join(__dirname, 'temp');
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir);
-      }
+      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
       const filePath = path.join(tempDir, `usercode_${teamId}.py`);
       const enginePath = path.join(__dirname, 'engine.py');
       const bot1Path = path.join(__dirname, 'bot1.py');
 
-     
       fs.writeFileSync(filePath, code);
 
-    
-      const command = `python "${enginePath}" --p1 "${bot1Path}" --p2 "${filePath}"`;
-
-     
       await new Promise((resolve) => {
-        exec(command, async (error, stdout, stderr) => {
+        exec(`python "${enginePath}" --p1 "${bot1Path}" --p2 "${filePath}"`, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error running code for team ${teamId}:`, error.message);
-           
             team.submissions.checkStatus = 'done';
-            await team.save().catch(e => console.error('Error updating status:', e.message));
-            return resolve();
+            return team.save().then(resolve);
           }
-///////////////////////////////////////////////////////////////////////////
 
-
-const gameData = [];
-
-fs.createReadStream("game_log.csv") 
-  .pipe(csv())
-  .on("data", (row) => {
-    gameData.push({
-      step: Number(row.step),
-      ball_x: Number(row.ball_x),
-      ball_y: Number(row.ball_y),
-      paddle1_x: Number(row.paddle1_x),
-      paddle2_x: Number(row.paddle2_x),
-      bot1_action: row.bot1_action,
-      bot2_action: row.bot2_action,
-      score_bot1: Number(row.score_bot1),
-      score_bot2: Number(row.score_bot2),
-    });
-  })
- .on("end", async () => {
-  console.log("CSV file successfully processed");
-  console.log("Parsed game data:", gameData);
-
-  if (Array.isArray(gameData) && gameData.length > 0) {
-    try {
-      team.game_log = gameData;
-      await team.save();
-      console.log("Game log saved to MongoDB.");
-    } catch (err) {
-      console.error("Error saving team:", err.message, err);
-    }
-  } else {
-    console.warn("No game data parsed from CSV for team", team._id);
-  }
-});
-
-
- //////////////////////////////////////////////////////////////////////////
-          console.log(`Output for team ${teamId}:`, stdout);
-
+          // Score parsing
           const scoreMatch = stdout.match(/Final Score: ({.*})/);
-
           if (scoreMatch) {
             try {
-            
               const score = eval('(' + scoreMatch[1] + ')');
-
-           team.submissions.score = score.bot2;
+              team.submissions.score = score.bot2;
               team.submissions.bot1Points = score.bot1;
-
-              if (score.bot1 > score.bot2) {
-                team.submissions.winner = 'bot1';
-              } else if (score.bot1 < score.bot2) {
-                team.submissions.winner = 'bot2';
-              } else {
-                team.submissions.winner = 'draw';
-              }
-            } catch (parseErr) {
-              console.error(`Failed to parse and save score for team ${teamId}:`, parseErr.message);
+              team.submissions.winner =
+                score.bot1 > score.bot2 ? 'bot1' :
+                score.bot1 < score.bot2 ? 'bot2' : 'draw';
+            } catch (e) {
+              console.error('Score parse error:', e.message);
             }
-          } else {
-            console.warn(`Could not find final score in output for team ${teamId}`);
           }
 
-   
           team.submissions.checkStatus = 'done';
 
-          try {
-            await team.save();
-            console.log(`Updated and saved team ${teamId}`);
-          } catch (saveErr) {
-            console.error(`Failed to save team ${teamId}:`, saveErr.message);
-          }
+          // Parse game_log.csv
+          const gameData = [];
+          fs.createReadStream("game_log.csv")
+            .pipe(csv())
+            .on("data", (row) => {
+              gameData.push({
+                step: Number(row.step),
+                ball_x: Number(row.ball_x),
+                ball_y: Number(row.ball_y),
+                paddle1_x: Number(row.paddle1_x),
+                paddle2_x: Number(row.paddle2_x),
+                bot1_action: row.bot1_action,
+                bot2_action: row.bot2_action,
+                score_bot1: Number(row.score_bot1),
+                score_bot2: Number(row.score_bot2),
+              });
+            })
+            .on("end", async () => {
+              if (gameData.length) {
+                team.game_log = gameData;
+              } else {
+                console.warn(`Empty game log for team ${teamId}`);
+              }
 
-         
-          try {
-            if (fs.existsSync(filePath)) {
-              fs.unlinkSync(filePath);
-              console.log(`Deleted temp file for team ${teamId}`);
-            } else {
-              console.warn(`Temp file for team ${teamId} already deleted or missing`);
-            }
-          } catch (deleteErr) {
-            console.error(`Failed to delete temp file for team ${teamId}:`, deleteErr.message);
-          }
+              try {
+                await team.save();
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+                console.log(`Team ${teamId} evaluated and saved.`);
+              } catch (e) {
+                console.error(`Save error for ${teamId}:`, e.message);
+              }
 
-          resolve();
+              resolve(); // Move this inside the .on("end") callback
+            });
         });
       });
     }
 
+    // ✅ Wait until all processing is done, then fetch updated teams
+    const allteams = await Team.find();
     res.json({ message: 'Evaluation complete for all pending submissions.', allteams });
   } catch (err) {
     console.error('Evaluation failed:', err.message);
     res.status(500).json({ message: 'Error during evaluation' });
   }
 });
+
 
 // app.get('/alllteams', async (req, res) => {
 //   try {
