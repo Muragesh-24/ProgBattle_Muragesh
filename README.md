@@ -47,6 +47,7 @@ Create a `.env` file and add the following:
 ```ini
 MONGO_URI=<your-mongo-db-uri>
 JWT_SECRET=<your-secret-key>
+pass=<your gmail app password>
 ```
 
 Start the backend:
