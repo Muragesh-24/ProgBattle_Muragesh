@@ -6,6 +6,10 @@ A Full-Stack Competitive Programming Matchmaking Platform
 *Best viewed on desktop*
 
 ---
+<h2><b>To Login as a Admin Use following username and Password</b></h2><br>
+<h3>Username :pclub_admin_access </h3><br>
+<h3><b>password : pclub@1234</b></h3><br>
+<h3>Just for evaluation purposes of my task, I added this login info. I will remove it afterward.</h3><br>
 
 ##  Repositories
 
